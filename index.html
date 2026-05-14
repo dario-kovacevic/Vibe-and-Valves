@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dario Kovacevic | Ingegneria Elettronica & Motori</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  :root {
+    --black: #0a0a0b;
+    --anthracite: #111214;
+    --anthracite-2: #18191d;
+    --grey-dark: #1e2025;
+    --grey-mid: #2a2d35;
+    --grey-metal: #3a3f4a;
+    --grey-light: #8a909d;
+    --grey-text: #b0b6c3;
+    --white: #f0f2f5;
+    --red: #c8102e;
+    --red-bright: #e8152f;
+    --red-dim: #7a0a1c;
+    --red-glow: rgba(200, 16, 46, 0.25);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ─── NOISE TEXTURE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.6;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--anthracite); }
+  ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 2px; }
+
+  /* ─── SELECTION ─── */
+  ::selection { background: var(--red); color: var(--white); }
+
+  /* ══════════════════════════════════════
+     HEADER / NAV
+  ══════════════════════════════════════ */
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 0 5vw;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(10,10,11,0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(200,16,46,0.15);
+    transition: background 0.3s;
+  }
+
+  .logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+  }
+
+  .logo span {
+    color: var(--red);
+  }
+
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  nav a {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--grey-text);
+    text-decoration: none;
+    position: relative;
+    transition: color 0.25s;
+  }
+
+  nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--red);
+    transition: width 0.3s ease;
+  }
+
+  nav a:hover { color: var(--white); }
+  nav a:hover::after { width: 100%; }
+
+  /* Hamburger */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 4px;
+    background: none;
+    border: none;
+  }
+
+  .hamburger span {
+    display: block;
+    width: 26px;
+    height: 2px;
+    background: var(--white);
+    transition: all 0.3s;
+    transform-origin: center;
+  }
+
+  .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.active span:nth-child(2) { opacity: 0; }
+  .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-nav {
+    display: none;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    background: rgba(10,10,11,0.97);
+    border-bottom: 1px solid rgba(200,16,46,0.2);
+    padding: 2rem 5vw;
+    z-index: 999;
+    transform: translateY(-110%);
+    transition: transform 0.35s ease;
+  }
+
+  .mobile-nav.open { transform: translateY(0); }
+
+  .mobile-nav ul { list-style: none; display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .mobile-nav a {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 1.4rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--grey-text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .mobile-nav a:hover { color: var(--red); }
+
+  /* ══════════════════════════════════════
+     HERO
+  ══════════════════════════════════════ */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 8vw;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Racing stripe diagonal accent */
+  #hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -5%;
+    width: 55%;
+    height: 100%;
+    background: linear-gradient(135deg, transparent 0%, rgba(200,16,46,0.04) 50%, transparent 100%);
+    border-left: 1px solid rgba(200,16,46,0.12);
+    transform: skewX(-8deg);
+  }
+
+  /* Speed lines bg */
+  #hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 140px,
+        rgba(255,255,255,0.012) 140px,
+        rgba(255,255,255,0.012) 141px
+      );
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 780px;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--red);
+    border: 1px solid rgba(200,16,46,0.4);
+    padding: 0.35rem 0.9rem;
+    margin-bottom: 2.2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.3s;
+  }
+
+  .hero-tag i { font-size: 0.7rem; }
+
+  h1.hero-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: clamp(3rem, 8vw, 7.5rem);
+    line-height: 0.92;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    color: var(--white);
+    margin-bottom: 1.8rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.5s;
+  }
+
+  h1.hero-title .red { color: var(--red); }
+
+  .hero-sub {
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.7;
+    color: var(--grey-text);
+    max-width: 540px;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.75s;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    background: var(--red);
+    padding: 1rem 2.2rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 1s;
+  }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.12);
+    transition: left 0.3s ease;
+  }
+
+  .btn-primary:hover::before { left: 100%; }
+  .btn-primary:hover { box-shadow: 0 0 30px var(--red-glow), 0 8px 24px rgba(0,0,0,0.5); transform: translateY(-2px); }
+
+  .btn-primary i { font-size: 0.85rem; transition: transform 0.3s; }
+  .btn-primary:hover i { transform: translateY(4px); }
+
+  /* RPM counter decoration */
+  .hero-rpm {
+    position: absolute;
+    right: 8vw;
+    bottom: 12vh;
+    opacity: 0;
+    animation: fadeIn 1.2s ease forwards 1.4s;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+  }
+
+  .rpm-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: var(--grey-metal);
+    text-transform: uppercase;
+  }
+
+  .rpm-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 4.5rem;
+    color: rgba(200,16,46,0.08);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  /* Scroll indicator */
+  .scroll-indicator {
+    position: absolute;
+    bottom: 3rem;
+    left: 8vw;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards 1.6s;
+  }
+
+  .scroll-line {
+    width: 40px;
+    height: 1px;
+    background: var(--red);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .scroll-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--white);
+    animation: scanLine 2s ease infinite;
+  }
+
+  .scroll-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--grey-metal);
+  }
+
+  /* ══════════════════════════════════════
+     SECTION BASE
+  ══════════════════════════════════════ */
+  section { padding: 100px 8vw; }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 1.5rem;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 22px;
+    height: 1px;
+    background: var(--red);
+  }
+
+  h2.section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    margin-bottom: 1rem;
+    color: var(--white);
+  }
+
+  h2.section-title em {
+    color: var(--red);
+    font-style: normal;
+  }
+
+  /* ══════════════════════════════════════
+     PASSION / 3 CARDS SECTION
+  ══════════════════════════════════════ */
+  #passione {
+    background: var(--anthracite);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #passione::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+  }
+
+  .passion-intro {
+    max-width: 700px;
+    margin-bottom: 5rem;
+  }
+
+  .passion-intro p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--grey-text);
+    margin-top: 1.2rem;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5px;
+    position: relative;
+  }
+
+  .card {
+    background: var(--anthracite-2);
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.35s;
+    border-top: 2px solid transparent;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(200,16,46,0.05) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.35s;
+  }
+
+  .card:hover { background: #1a1c21; }
+  .card:hover::before { opacity: 1; }
+  .card:hover { border-top-color: var(--red); }
+
+  .card-number {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 5rem;
+    color: rgba(200,16,46,0.06);
+    line-height: 1;
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    transition: color 0.35s;
+    letter-spacing: -0.03em;
+  }
+
+  .card:hover .card-number { color: rgba(200,16,46,0.12); }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border: 1px solid rgba(200,16,46,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.8rem;
+    color: var(--red);
+    font-size: 1.15rem;
+    transition: all 0.3s;
+  }
+
+  .card:hover .card-icon {
+    background: var(--red);
+    color: var(--white);
+    border-color: var(--red);
+    box-shadow: 0 0 20px var(--red-glow);
+  }
+
+  .card h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    color: var(--white);
+  }
+
+  .card p {
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--grey-text);
+    font-weight: 300;
+  }
+
+  /* ══════════════════════════════════════
+     PROGETTO SECTION
+  ══════════════════════════════════════ */
+  #progetto {
+    background: var(--black);
+    position: relative;
+  }
+
+  .progetto-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+    margin-top: 3rem;
+  }
+
+  .progetto-text h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--white);
+    margin-bottom: 1.2rem;
+  }
+
+  .progetto-text p {
+    font-size: 0.98rem;
+    line-height: 1.8;
+    color: var(--grey-text);
+    font-weight: 300;
+  }
+
+  .progetto-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .link-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: var(--anthracite-2);
+    border: 1px solid var(--grey-mid);
+    padding: 1.8rem 2rem;
+    text-decoration: none;
+    color: var(--white);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.35s;
+    group: true;
+  }
+
+  .link-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    left: 0;
+    width: 3px;
+    background: var(--red);
+    transition: width 0.35s ease;
+  }
+
+  .link-card:hover {
+    border-color: rgba(200,16,46,0.4);
+    transform: translateX(4px);
+    box-shadow: -6px 0 30px rgba(200,16,46,0.1);
+  }
+
+  .link-card:hover::after { width: 100%; opacity: 0.06; }
+
+  .link-card-icon {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(200,16,46,0.3);
+    color: var(--red);
+    font-size: 1.3rem;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 1;
+  }
+
+  .link-card:hover .link-card-icon {
+    background: var(--red);
+    color: var(--white);
+  }
+
+  .link-card-info { position: relative; z-index: 1; }
+
+  .link-card-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 0.3rem;
+  }
+
+  .link-card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: color 0.2s;
+  }
+
+  .link-card-desc {
+    font-size: 0.82rem;
+    color: var(--grey-text);
+    margin-top: 0.2rem;
+  }
+
+  .link-card-arrow {
+    margin-left: auto;
+    color: var(--grey-metal);
+    font-size: 0.85rem;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 1;
+  }
+
+  .link-card:hover .link-card-arrow {
+    color: var(--red);
+    transform: translateX(4px);
+  }
+
+  /* ══════════════════════════════════════
+     VISION SECTION (divider)
+  ══════════════════════════════════════ */
+  .vision-strip {
+    background: var(--red);
+    padding: 5rem 8vw;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .vision-strip::before {
+    content: '"';
+    position: absolute;
+    top: -2rem;
+    left: 5vw;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20rem;
+    font-weight: 900;
+    color: rgba(0,0,0,0.1);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .vision-quote {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.6rem, 4vw, 3rem);
+    text-transform: uppercase;
+    line-height: 1.15;
+    max-width: 900px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .vision-author {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 1.5rem;
+    opacity: 0.7;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ══════════════════════════════════════
+     CONTATTI
+  ══════════════════════════════════════ */
+  #contatti {
+    background: var(--anthracite);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #contatti::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+  }
+
+  .contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+    margin-top: 3rem;
+  }
+
+  .contact-text p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--grey-text);
+    margin-top: 1.2rem;
+  }
+
+  .contact-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    text-decoration: none;
+    color: var(--grey-text);
+    padding: 1.4rem 1.8rem;
+    background: var(--grey-dark);
+    border: 1px solid var(--grey-mid);
+    transition: all 0.3s;
+  }
+
+  .contact-item:hover {
+    border-color: rgba(200,16,46,0.4);
+    color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  }
+
+  .contact-item i {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(200,16,46,0.3);
+    color: var(--red);
+    font-size: 1rem;
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+
+  .contact-item:hover i {
+    background: var(--red);
+    color: var(--white);
+    box-shadow: 0 0 20px var(--red-glow);
+  }
+
+  .contact-item-info small {
+    display: block;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 0.2rem;
+  }
+
+  .contact-item-info span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    color: var(--white);
+  }
+
+  /* ══════════════════════════════════════
+     FOOTER
+  ══════════════════════════════════════ */
+  footer {
+    background: var(--black);
+    border-top: 1px solid var(--grey-dark);
+    padding: 2rem 8vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--grey-metal);
+  }
+
+  .footer-logo span { color: var(--red); }
+
+  .footer-copy {
+    font-size: 0.78rem;
+    color: var(--grey-metal);
+    letter-spacing: 0.05em;
+    font-family: 'Rajdhani', sans-serif;
+  }
+
+  /* ══════════════════════════════════════
+     ANIMATIONS
+  ══════════════════════════════════════ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes scanLine {
+    0%   { left: -100%; }
+    50%  { left: 100%; }
+    100% { left: 100%; }
+  }
+
+  /* Reveal on scroll */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.75s ease, transform 0.75s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.22s; }
+  .reveal-delay-3 { transition-delay: 0.34s; }
+
+  /* ══════════════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════════════ */
+  @media (max-width: 900px) {
+    nav ul { display: none; }
+    .hamburger { display: flex; }
+    .mobile-nav { display: block; }
+
+    .cards-grid { grid-template-columns: 1fr; gap: 2px; }
+    .progetto-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+    .contact-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+    .hero-rpm { display: none; }
+
+    section { padding: 70px 6vw; }
+    header { padding: 0 6vw; }
+    footer { flex-direction: column; text-align: center; }
+  }
+
+  @media (max-width: 480px) {
+    h1.hero-title { font-size: 3rem; }
+    section { padding: 60px 5vw; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header>
+  <a href="#hero" class="logo">Dario <span>Kovacevic</span></a>
+
+  <nav>
+    <ul>
+      <li><a href="#passione">Passione</a></li>
+      <li><a href="#progetto">Progetto</a></li>
+      <li><a href="#contatti">Contatti</a></li>
+    </ul>
+  </nav>
+
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<nav class="mobile-nav" id="mobileNav">
+  <ul>
+    <li><a href="#passione" class="mobile-link">Passione</a></li>
+    <li><a href="#progetto" class="mobile-link">Progetto</a></li>
+    <li><a href="#contatti" class="mobile-link">Contatti</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section id="hero">
+  <div class="hero-content">
+    <div class="hero-tag">
+      <i class="fas fa-microchip"></i>
+      Ingegneria Elettronica · Motori · Visione
+    </div>
+
+    <h1 class="hero-title">
+      L'ingegneria<br>che fa battere<br>il <span class="red">cuore.</span>
+    </h1>
+
+    <p class="hero-sub">
+      Unire l'elettronica alle emozioni della guida per progettare le macchine di domani — dove ogni chip è al servizio del feeling, non il contrario.
+    </p>
+
+    <a href="#passione" class="btn-primary">
+      Scopri la mia visione
+      <i class="fas fa-chevron-down"></i>
+    </a>
+  </div>
+
+  <div class="hero-rpm">
+    <span class="rpm-label">Rev / Min</span>
+    <span class="rpm-value">9000</span>
+  </div>
+
+  <div class="scroll-indicator">
+    <div class="scroll-line"></div>
+    <span class="scroll-text">Scroll</span>
+  </div>
+</section>
+
+<!-- ═══════════ PASSIONE / 3 CARDS ═══════════ -->
+<section id="passione">
+  <div class="passion-intro reveal">
+    <span class="section-label"><i class="fas fa-fire"></i> La Passione</span>
+    <h2 class="section-title">Motori, Emozioni<br>e <em>Chip</em></h2>
+    <p>
+      L'ingegneria elettronica non è fatta solo di schermi e codice. Per chi è cresciuto con l'odore della benzina nelle narici e il rombo di un motore nelle orecchie, è il linguaggio con cui si può dare un'anima alle macchine. È una disciplina che, nelle mani giuste, può amplificare — invece di soffocare — le emozioni più autentiche della guida.
+    </p>
+  </div>
+
+  <div class="cards-grid">
+    <!-- Card 1: La Passione -->
+    <div class="card reveal reveal-delay-1">
+      <span class="card-number">01</span>
+      <div class="card-icon"><i class="fas fa-heart-pulse"></i></div>
+      <h3>Il Battito<br>della Guida</h3>
+      <p>
+        Guidare non è semplicemente spostarsi da A a B. È un dialogo continuo tra te e la macchina: senti ogni curva, ogni frenata, ogni millimetro di asfalto. Una moto che scivola in piega o un'auto che risponde al millimetro in uscita di curva ti fanno sentire vivi come poche altre cose al mondo. Questa sensazione non ha prezzo — e non si può perdere.
+      </p>
+    </div>
+
+    <!-- Card 2: Il Problema -->
+    <div class="card reveal reveal-delay-2">
+      <span class="card-number">02</span>
+      <div class="card-icon"><i class="fas fa-triangle-exclamation"></i></div>
+      <h3>Il Rischio<br>dell'Anonimato</h3>
+      <p>
+        Oggi le auto rischiano di diventare capsule impersonali: efficienti, silenziose, quasi asettiche. Ogni sistema elettronico aggiunto senza criterio mette un muro tra il pilota e la strada. Il rischio reale è perdere quella connessione viscerala, quell'istinto che trasforma una semplice guida in qualcosa di indimenticabile. Noi appassionati abbiamo il terrore di questo futuro.
+      </p>
+    </div>
+
+    <!-- Card 3: La Soluzione -->
+    <div class="card reveal reveal-delay-3">
+      <span class="card-number">03</span>
+      <div class="card-icon"><i class="fas fa-microchip"></i></div>
+      <h3>L'Elettronica<br>come Cervello</h3>
+      <p>
+        La soluzione non è eliminare la tecnologia, ma ripensarla. L'elettronica, progettata con intelligenza, diventa il cervello che amplifica i tuoi riflessi senza sostituirli. Sistemi di controllo che ti fanno sentire più pilota, non meno. L'intelligenza artificiale che comprende il tuo stile di guida e si adatta a te. La tecnologia al servizio dell'emozione, non il contrario.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ VISION STRIP ═══════════ -->
+<div class="vision-strip reveal">
+  <p class="vision-quote">
+    "L'ingegnere del domani non deve essere un robot che programma altri robot. Deve saper sentire cosa prova chi sta al volante."
+  </p>
+  <p class="vision-author">— Dario Kovacevic · Visione 2035</p>
+</div>
+
+<!-- ═══════════ PROGETTO ═══════════ -->
+<section id="progetto">
+  <span class="section-label reveal"><i class="fas fa-diagram-project"></i> Digital Transformation</span>
+  <h2 class="section-title reveal">Il Progetto:<br><em>Trasformazione</em> Digitale</h2>
+
+  <div class="progetto-layout">
+    <div class="progetto-text reveal">
+      <h3>Dove Teoria e Passione si Incontrano</h3>
+      <p>
+        Questo progetto nasce dall'idea che la trasformazione digitale del settore automotive non debba sacrificare l'identità emotiva delle automobili. Ho esplorato come i processi di innovazione tecnologica possano essere guidati da una visione che mette il pilota — e le sue sensazioni — al centro di ogni decisione di design e ingegneristia.
+      </p>
+      <br>
+      <p>
+        Il lavoro si articola in una strategia strutturata su Miro e in un approfondimento divulgativo su LinkedIn, pensato per chi ama i motori ma vuole capire dove sta andando l'industria. Perché la tecnologia è utile, ma l'emozione è tutto.
+      </p>
+    </div>
+
+    <div class="progetto-links reveal reveal-delay-2">
+      <!-- Link 1: Miro -->
+      <a href="https://miro.com/YOUR-BOARD-LINK" target="_blank" class="link-card">
+        <div class="link-card-icon"><i class="fas fa-chalkboard"></i></div>
+        <div class="link-card-info">
+          <div class="link-card-label">Strategia Visiva</div>
+          <div class="link-card-title">Board Strategica</div>
+          <div class="link-card-desc">Analisi e roadmap su Miro</div>
+        </div>
+        <i class="fas fa-arrow-right link-card-arrow"></i>
+      </a>
+
+      <!-- Link 2: LinkedIn -->
+      <a href="https://linkedin.com/in/YOUR-POST-LINK" target="_blank" class="link-card">
+        <div class="link-card-icon"><i class="fab fa-linkedin-in"></i></div>
+        <div class="link-card-info">
+          <div class="link-card-label">Approfondimento</div>
+          <div class="link-card-title">Post su LinkedIn</div>
+          <div class="link-card-desc">La mia visione sull'automotive elettronico</div>
+        </div>
+        <i class="fas fa-arrow-right link-card-arrow"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CONTATTI ═══════════ -->
+<section id="contatti">
+  <div class="contact-layout">
+    <div class="contact-text reveal">
+      <span class="section-label"><i class="fas fa-satellite-dish"></i> Contatti</span>
+      <h2 class="section-title">Parliamo<br>di <em>Motori.</em></h2>
+      <p>
+        Hai un progetto, una domanda o semplicemente vuoi parlare di ingegneria e passione per i motori? Trovami su LinkedIn o scrivimi direttamente. Rispondo a tutti.
+      </p>
+    </div>
+
+    <div class="contact-methods reveal reveal-delay-2">
+      <a href="mailto:dario.kkovacevic@gmail.com" class="contact-item">
+        <i class="fas fa-envelope"></i>
+        <div class="contact-item-info">
+          <small>Email</small>
+          <span>dario.kkovacevic@gmail.com</span>
+        </div>
+      </a>
+
+      <a href="https://linkedin.com/in/YOUR-LINKEDIN" target="_blank" class="contact-item">
+        <i class="fab fa-linkedin-in"></i>
+        <div class="contact-item-info">
+          <small>LinkedIn</small>
+          <span>Dario Kovacevic</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer>
+  <div class="footer-logo">Dario <span>Kovacevic</span></div>
+  <div class="footer-copy">© 2026 Dario Kovacevic — Ingegneria, Elettronica e Motori</div>
+</footer>
+
+<!-- ═══════════ JAVASCRIPT ═══════════ -->
+<script>
+  /* ── Hamburger menu ── */
+  const hamburger = document.getElementById('hamburger');
+  const mobileNav = document.getElementById('mobileNav');
+  const mobileLinks = document.querySelectorAll('.mobile-link');
+
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    mobileNav.classList.toggle('open');
+    document.body.style.overflow = mobileNav.classList.contains('open') ? 'hidden' : '';
+  });
+
+  mobileLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('active');
+      mobileNav.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  });
+
+  /* ── Scroll reveal ── */
+  const revealEls = document.querySelectorAll('.reveal');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -60px 0px'
+  });
+
+  revealEls.forEach(el => observer.observe(el));
+
+  /* ── Header shadow on scroll ── */
+  const header = document.querySelector('header');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 20) {
+      header.style.background = 'rgba(10,10,11,0.97)';
+    } else {
+      header.style.background = 'rgba(10,10,11,0.88)';
+    }
+  });
+
+  /* ── Smooth anchor scrolling (offset for fixed header) ── */
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      const offsetTop = target.getBoundingClientRect().top + window.scrollY - 70;
+      window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>
